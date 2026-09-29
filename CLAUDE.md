@@ -12,11 +12,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Database conventions
 
-- Money is integer cents (`*_cents`, USD). Never use `numeric` or floats for prices.
-- Stock lives only in the `stock` table (1:1 with products), never as a column on `products`.
+- Money is integer paise (`*_paise`, INR). Never use `numeric` or floats for prices.
+- Stock lives only in the `stock` table (1:1 with products), never as a column on `products`. It is the quantity available to sell: checkout reserves (decrements) it when the order is created, and expiry/failure releases it (`src/db/queries/orders.ts`).
 - Schema changes go through `pnpm db:generate` + `pnpm db:migrate`, with the generated SQL in `drizzle/` committed. Don't use `db:push`.
 - Routes that read the DB use `export const dynamic = "force-dynamic"` and no `generateStaticParams`, so stock stays current and builds never query the DB.
 - DB access goes in `src/db/queries/`. `src/lib/catalog.ts` must stay free of DB imports so any component can use it.
-- Keep v1 scope: no orders, checkout, payments, wishlists, reviews, warehouses or variants unless asked.
-- The bag (cart) is a `bag` cookie of `[productId, quantity]` pairs only (`src/lib/cart.ts`, `src/lib/bag-cookie.ts`). Prices and stock always come from the DB; only the actions in `src/app/bag/actions.ts` write the cookie.
-- `pnpm db:seed` is re-runnable but resets stock to the seed values.
+- Keep v1 scope: no wishlists, reviews, warehouses, variants, tax or refunds-in-app unless asked.
+- Checkout is Stripe hosted Checkout with inline `price_data` from DB prices (no Stripe product catalogue, no `payment_method_types`). Order status changes only from a signature-verified webhook (`src/app/api/stripe/webhook/route.ts`) or a server-side `checkout.sessions.retrieve`, both through the idempotent `fulfillOrder`/`releaseOrder`. Never from client input or URL params.
+- The bag (cart) is a `bag` cookie of `[productId, quantity]` pairs only (`src/lib/cart.ts`, `src/lib/bag-cookie.ts`). Prices and stock always come from the DB; only the actions in `src/app/bag/actions.ts` write the cookie (including `clearOrderedItems` after a paid order).
+- `pnpm db:seed` is re-runnable but resets stock to the seed values. Pending orders released afterwards add their units on top, so expire them first outside local dev.
+- `drizzle-kit generate` asks interactively about column renames, which agents can't answer. Write renames as `pnpm db:generate --custom --name <x>` and patch that migration's snapshot to match the schema (see `drizzle/0002_inr.sql`).

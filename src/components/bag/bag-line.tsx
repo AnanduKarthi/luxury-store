@@ -67,12 +67,12 @@ export function BagLine({ line }: { line: Line }) {
           </div>
           <div className="type-body shrink-0 text-right">
             {soldOut ? (
-              <p className="text-muted line-through">{formatPrice(product.priceCents)}</p>
+              <p className="text-muted line-through">{formatPrice(product.pricePaise)}</p>
             ) : (
-              <p>{formatPrice(line.lineTotalCents)}</p>
+              <p>{formatPrice(line.lineTotalPaise)}</p>
             )}
             {!soldOut && quantity > 1 && (
-              <p className="text-muted">{formatPrice(product.priceCents)} each</p>
+              <p className="text-muted">{formatPrice(product.pricePaise)} each</p>
             )}
           </div>
         </div>

@@ -9,7 +9,7 @@ export type Product = {
   name: string;
   productType: string; // display label, e.g. "Handbags"
   category: { slug: string; name: string };
-  priceCents: number;
+  pricePaise: number;
   images: string[]; // 3:4 crops; the first is the primary image
   badge: string | null;
   stock: number;
@@ -23,10 +23,11 @@ export const LOW_STOCK_THRESHOLD = 3;
 export const getStockStatus = (stock: number): StockStatus =>
   stock <= 0 ? "sold-out" : stock <= LOW_STOCK_THRESHOLD ? "low-stock" : "in-stock";
 
-const priceFormat = new Intl.NumberFormat("en-US", {
+// Indian digit grouping, e.g. ₹2,95,000.
+const priceFormat = new Intl.NumberFormat("en-IN", {
   style: "currency",
-  currency: "USD",
+  currency: "INR",
   trailingZeroDisplay: "stripIfInteger",
 });
 
-export const formatPrice = (cents: number) => priceFormat.format(cents / 100);
+export const formatPrice = (paise: number) => priceFormat.format(paise / 100);

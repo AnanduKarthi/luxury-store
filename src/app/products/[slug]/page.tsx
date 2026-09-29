@@ -68,7 +68,7 @@ export default async function ProductPage(props: PageProps<"/products/[slug]">) 
             <div className="lg:sticky lg:top-36">
               <p className="type-caption mb-3 text-muted">{product.productType}</p>
               <h1 className="type-title-m mb-4">{product.name}</h1>
-              <p className="type-body-l mb-6">{formatPrice(product.priceCents)}</p>
+              <p className="type-body-l mb-6">{formatPrice(product.pricePaise)}</p>
 
               <dl className="mb-6 border-t border-divider pt-6">
                 <div className="flex gap-2">

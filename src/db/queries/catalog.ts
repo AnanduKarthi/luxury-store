@@ -11,7 +11,7 @@ const productColumns = {
   productType: products.productType,
   categorySlug: categories.slug,
   categoryName: categories.name,
-  priceCents: products.priceCents,
+  pricePaise: products.pricePaise,
   images: products.images,
   badge: products.badge,
   quantity: stock.quantity,

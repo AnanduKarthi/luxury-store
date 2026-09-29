@@ -28,8 +28,8 @@ export const products = pgTable(
       .references(() => categories.id, { onDelete: "restrict" }),
     // Display label shown above the product name, e.g. "Handbags".
     productType: text("product_type").notNull(),
-    // Whole cents, USD.
-    priceCents: integer("price_cents").notNull(),
+    // Whole paise, INR.
+    pricePaise: integer("price_paise").notNull(),
     colour: text("colour").notNull(),
     description: text("description").notNull(),
     details: text("details").array().notNull().default(sql`'{}'::text[]`),
@@ -43,7 +43,7 @@ export const products = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
-    check("products_price_cents_non_negative", sql`${table.priceCents} >= 0`),
+    check("products_price_paise_non_negative", sql`${table.pricePaise} >= 0`),
     index("products_category_id_idx").on(table.categoryId),
     index("products_created_at_idx").on(table.createdAt),
   ],

@@ -1,4 +1,6 @@
+import { getSessionCookie } from "better-auth/cookies";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { BagLine } from "@/components/bag/bag-line";
 import { BagSummary } from "@/components/bag/bag-summary";
@@ -14,9 +16,15 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function BagPage() {
+export default async function BagPage(props: PageProps<"/bag">) {
+  const { checkout } = await props.searchParams;
   const entries = await readBag();
   const products = await getProductsByIds(entries.map((entry) => entry.productId));
+  // Only picks "Checkout" vs "Sign in to check out", so a cookie check is
+  // enough; the checkout action verifies the session itself.
+  const signedIn = Boolean(getSessionCookie(await headers()));
+  // Set by /checkout/cancel when the customer backs out of Stripe Checkout.
+  const notice = checkout === "cancelled" ? "cancelled" : undefined;
   // Quantities are clamped to current stock for display; the cookie itself is
   // corrected by the next bag action (server components can't set cookies).
   const bag = buildBag(entries, products);
@@ -59,7 +67,7 @@ export default async function BagPage() {
               ))}
             </ul>
             <div>
-              <BagSummary bag={bag} />
+              <BagSummary bag={bag} signedIn={signedIn} notice={notice} />
               <Link href="/collections/new-in" className="type-cta link-underline mt-6 inline-block">
                 Continue shopping
               </Link>

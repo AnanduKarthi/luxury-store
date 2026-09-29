@@ -43,7 +43,7 @@ export function ProductCard({
             {product.name}
           </Link>
         </h3>
-        <p className="type-body text-muted">{formatPrice(product.priceCents)}</p>
+        <p className="type-body text-muted">{formatPrice(product.pricePaise)}</p>
       </div>
     </article>
   );

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getProductsByIds } from "@/db/queries/catalog";
+import { getOrderForUser } from "@/db/queries/orders";
 import { readBag, writeBag } from "@/lib/bag-cookie";
 import {
   availableFor,
@@ -12,6 +13,7 @@ import {
   normalizedEntries,
   type BagEntry,
 } from "@/lib/cart";
+import { getSession } from "@/lib/session";
 
 export type BagActionResult =
   | { ok: true; quantity: number; adjusted?: string }
@@ -102,4 +104,19 @@ export async function removeFromBag(productId: unknown): Promise<BagActionResult
   }
   await save(entries.filter((entry) => entry.productId !== id));
   return { ok: true, quantity: 0 };
+}
+
+// After a paid order, takes its pieces out of the bag. Anything added to the
+// bag since checkout started stays. Only acts on the caller's own paid order.
+export async function clearOrderedItems(orderId: unknown): Promise<void> {
+  if (!isProductId(orderId)) return;
+  const auth = await getSession();
+  if (!auth) return;
+  const order = await getOrderForUser(orderId.toLowerCase(), auth.user.id);
+  if (order?.status !== "paid") return;
+
+  const ordered = new Set(order.items.map((item) => item.productId));
+  const entries = await readBag();
+  const remaining = entries.filter((entry) => !ordered.has(entry.productId));
+  if (remaining.length !== entries.length) await save(remaining);
 }

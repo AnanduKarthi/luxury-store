@@ -11,19 +11,19 @@ export type BagLineStatus = "ok" | "reduced" | "sold-out";
 export type BagLine = {
   product: Pick<
     Product,
-    "id" | "slug" | "name" | "productType" | "colour" | "priceCents" | "images" | "stock"
+    "id" | "slug" | "name" | "productType" | "colour" | "pricePaise" | "images" | "stock"
   >;
   requested: number; // what the cookie asked for
   quantity: number; // what can actually be bought now
   available: number; // most this line may hold
   status: BagLineStatus;
-  lineTotalCents: number;
+  lineTotalPaise: number;
 };
 
 export type Bag = {
   lines: BagLine[];
   itemCount: number; // units counted in the subtotal
-  subtotalCents: number;
+  subtotalPaise: number;
   hasUnavailable: boolean;
 };
 
@@ -91,13 +91,13 @@ export function buildBag(entries: BagEntry[], products: BagLine["product"][]): B
       quantity,
       available,
       status,
-      lineTotalCents: product.priceCents * quantity,
+      lineTotalPaise: product.pricePaise * quantity,
     });
   }
   return {
     lines,
     itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
-    subtotalCents: lines.reduce((sum, line) => sum + line.lineTotalCents, 0),
+    subtotalPaise: lines.reduce((sum, line) => sum + line.lineTotalPaise, 0),
     hasUnavailable: lines.some((line) => line.status === "sold-out"),
   };
 }

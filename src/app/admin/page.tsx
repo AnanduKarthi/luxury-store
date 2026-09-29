@@ -19,7 +19,11 @@ export default async function AdminPage() {
     <main className="container-page section-y flex-1">
       <div className="mx-auto max-w-3xl">
         <p className="type-caption mb-3 text-muted">Signed in as {user.email}</p>
-        <h1 className="type-title-l mb-10">Stock</h1>
+        <h1 className="type-title-l mb-3">Stock</h1>
+        <p className="type-body mb-10 text-muted">
+          Quantities available to sell. Pieces held by a checkout in progress are already
+          deducted and return automatically if it isn’t paid.
+        </p>
         <table className="w-full">
           <thead className="type-caption text-left text-muted">
             <tr className="border-b border-divider">

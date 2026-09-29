@@ -6,6 +6,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 
 const items = [
   { label: "Overview", href: "/account" },
+  { label: "Orders", href: "/account/orders" },
   { label: "Account details", href: "/account/details" },
 ];
 
