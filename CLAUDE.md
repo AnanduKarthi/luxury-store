@@ -17,5 +17,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Schema changes go through `pnpm db:generate` + `pnpm db:migrate`, with the generated SQL in `drizzle/` committed. Don't use `db:push`.
 - Routes that read the DB use `export const dynamic = "force-dynamic"` and no `generateStaticParams`, so stock stays current and builds never query the DB.
 - DB access goes in `src/db/queries/`. `src/lib/catalog.ts` must stay free of DB imports so any component can use it.
-- Keep v1 scope: no carts, orders, payments, wishlists, reviews, warehouses or variants unless asked.
+- Keep v1 scope: no orders, checkout, payments, wishlists, reviews, warehouses or variants unless asked.
+- The bag (cart) is a `bag` cookie of `[productId, quantity]` pairs only (`src/lib/cart.ts`, `src/lib/bag-cookie.ts`). Prices and stock always come from the DB; only the actions in `src/app/bag/actions.ts` write the cookie.
 - `pnpm db:seed` is re-runnable but resets stock to the seed values.

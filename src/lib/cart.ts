@@ -102,8 +102,11 @@ export function buildBag(entries: BagEntry[], products: BagLine["product"][]): B
   };
 }
 
-// Entries as they should be persisted after validating against stock.
+// Entries as they should be persisted after validating against stock: deleted
+// products go, over-stock quantities are lowered, and sold-out lines keep
+// their quantity so they stay visible until the customer removes them.
 export const normalizedEntries = (bag: Bag): BagEntry[] =>
-  bag.lines
-    .filter((line) => line.quantity > 0)
-    .map((line) => ({ productId: line.product.id, quantity: line.quantity }));
+  bag.lines.map((line) => ({
+    productId: line.product.id,
+    quantity: line.status === "sold-out" ? line.requested : line.quantity,
+  }));

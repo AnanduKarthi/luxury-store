@@ -7,14 +7,17 @@
       "Bash(git status)",
       "Bash(git diff *)"
     ],
-    "ask": [
-      "Bash(git push *)"
-    ],
     "deny": [
       "Read(.env)",
       "Read(.env.*)",
       "Edit(.env)",
       "Edit(.env.*)"
+    ],
+    "ask": [
+      "Bash(git push *)"
     ]
+  },
+  "enabledPlugins": {
+    "stripe@claude-plugins-official": true
   }
 }

@@ -85,3 +85,9 @@ export const EyeOffIcon = (props: IconProps) => (
     <path d="M4 4l16 16" />
   </Icon>
 );
+
+export const MinusIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M5 12h14" />
+  </Icon>
+);

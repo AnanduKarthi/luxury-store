@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AddToBagButton } from "@/components/bag/add-to-bag-button";
 import { HeartIcon } from "@/components/icons";
 import { SectionHeading } from "@/components/home/section-heading";
 import { ProductCard } from "@/components/product/product-card";
@@ -80,14 +81,14 @@ export default async function ProductPage(props: PageProps<"/products/[slug]">) 
                 <StockStatus stock={product.stock} />
               </div>
 
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="btn btn-primary flex-1"
-                  disabled={soldOut}
-                >
-                  {soldOut ? "Sold out" : "Add to bag"}
-                </button>
+              <div className="flex flex-wrap gap-x-2 gap-y-3">
+                {soldOut ? (
+                  <button type="button" className="btn btn-primary flex-1" disabled>
+                    Sold out
+                  </button>
+                ) : (
+                  <AddToBagButton productId={product.id} />
+                )}
                 <button
                   type="button"
                   aria-label={`Save ${product.name}`}

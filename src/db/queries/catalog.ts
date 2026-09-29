@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
 import { categories, products, stock } from "@/db/schema";
@@ -101,5 +101,12 @@ export async function getRelatedProducts(product: Product, limit = 8) {
       desc(products.createdAt),
     )
     .limit(limit);
+  return rows.map(toProduct);
+}
+
+// Current price and stock for the bag. Unknown ids are simply absent.
+export async function getProductsByIds(ids: string[]) {
+  if (ids.length === 0) return [];
+  const rows = await selectProducts().where(inArray(products.id, ids));
   return rows.map(toProduct);
 }

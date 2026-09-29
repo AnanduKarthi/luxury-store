@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { BagIcon, SearchIcon, UserIcon } from "@/components/icons";
+import { SearchIcon, UserIcon } from "@/components/icons";
 import { navigation } from "@/lib/site-content";
+import { BagLink } from "./bag-link";
 import { MobileNav } from "./mobile-nav";
 
 export function SiteHeader() {
@@ -32,9 +33,7 @@ export function SiteHeader() {
             <Link href="/account" aria-label="Account" className="btn-icon">
               <UserIcon />
             </Link>
-            <Link href="/bag" aria-label="Shopping bag" className="btn-icon">
-              <BagIcon />
-            </Link>
+            <BagLink />
           </div>
         </div>
 
