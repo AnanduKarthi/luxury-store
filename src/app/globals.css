@@ -1,0 +1,513 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design system
+   Monochrome, image-led, typographic. Colour comes from product imagery, not
+   the UI. Hierarchy is carried by size, weight and case rather than colour.
+   ========================================================================== */
+
+/* --- Semantic colour (flips inside .inverse) -----------------------------
+   Custom CSS below must read these raw variables (var(--foreground)), not the
+   --color-* theme aliases: the aliases resolve once on :root and would not
+   follow an .inverse override. Tailwind utilities (text-foreground etc.) are
+   fine because @theme inline makes them reference the raw variables. */
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --muted: #767676; /* secondary text, disabled; AA on white */
+  --subtle: #f9f9f9; /* secondary surfaces (footer, panels) */
+  --canvas: #fbfbfb; /* behind product imagery */
+  --divider: rgb(0 0 0 / 0.15);
+  --divider-strong: rgb(0 0 0 / 0.3);
+  --overlay: rgb(0 0 0 / 0.4); /* backdrops behind drawers/modals */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-canvas: var(--canvas);
+  --color-divider: var(--divider);
+  --color-divider-strong: var(--divider-strong);
+  --color-overlay: var(--overlay);
+
+  --font-sans: var(--font-geist-sans), "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+}
+
+/* --- Static tokens -------------------------------------------------------- */
+@theme static {
+  /* Status colours: used sparingly, text-only */
+  --color-error: #cc0000;
+  --color-success: #006633;
+  --color-warning: #994d00;
+  --color-focus: #337eff;
+
+  /* Breakpoints: mobile-first; lg is the main layout switch */
+  --breakpoint-md: 48rem; /* 768px  tablet */
+  --breakpoint-lg: 64rem; /* 1024px desktop */
+  --breakpoint-xl: 90rem; /* 1440px wide */
+
+  /* Page width: 1376px content inside a 1440px viewport */
+  --container-page: 86rem;
+  --container-prose: 41rem;
+  --container-form: 27.5rem;
+
+  /* Semantic spacing (responsive values set below).
+     Everything else uses Tailwind's 0.25rem scale. */
+  --spacing-gutter: 1rem;
+  --spacing-section: 3rem;
+  --spacing-header: 3.5rem;
+
+  /* Corners: near-square. Only controls get a hint of radius. */
+  --radius-control: 2px;
+
+  /* Imagery */
+  --aspect-product: 3 / 4;
+  --aspect-portrait: 2 / 3;
+  --aspect-landscape: 3 / 2;
+  --aspect-hero: 16 / 9;
+
+  /* Motion: slow, decisive ease-out */
+  --ease-luxe: cubic-bezier(0.5, 0, 0, 1);
+  --default-transition-timing-function: var(--ease-luxe);
+  --default-transition-duration: 300ms;
+  --animate-duration-slow: 800ms;
+
+  --shadow-float: 0 8px 24px 0 rgb(0 0 0 / 0.1);
+}
+
+@media (width >= 48rem) {
+  :root {
+    --spacing-gutter: 1.5rem;
+    --spacing-section: 4rem;
+  }
+}
+
+@media (width >= 64rem) {
+  :root {
+    --spacing-gutter: 2rem;
+    --spacing-section: 6rem;
+    --spacing-header: 4.5rem;
+  }
+}
+
+/* --- Base ----------------------------------------------------------------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: inherit;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  hr {
+    border-color: var(--divider);
+  }
+
+  img,
+  video {
+    background-color: var(--canvas);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--foreground);
+    color: var(--background);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* --- Colour context ------------------------------------------------------- */
+/* Dark band / overlay-on-image context. All semantic colours, buttons and
+   links inside it flip automatically. */
+@utility inverse {
+  --background: #191919;
+  --foreground: #ffffff;
+  --muted: #a3a3a3;
+  --subtle: #262626;
+  --canvas: #202020;
+  --divider: rgb(255 255 255 / 0.2);
+  --divider-strong: rgb(255 255 255 / 0.5);
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Inverse colours without the dark fill: text and CTAs laid over imagery */
+@utility on-image {
+  @apply inverse;
+  background-color: transparent;
+}
+
+/* Horizontal scroller for product/collection rails; bleeds to the viewport
+   edge on mobile and keeps the first item aligned with the page gutter. */
+@utility rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 70%;
+  gap: 0.25rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--spacing-gutter);
+  padding-inline: var(--spacing-gutter);
+  margin-inline: calc(var(--spacing-gutter) * -1);
+  scrollbar-width: none;
+  & > * {
+    scroll-snap-align: start;
+  }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  @variant md {
+    grid-auto-columns: calc((100% - 1rem) / 3);
+    gap: 0.5rem;
+  }
+  @variant lg {
+    grid-auto-columns: calc((100% - 1.5rem) / 4);
+  }
+}
+
+/* --- Typography ------------------------------------------------------------
+   One sans family. Big type is light; small labels are bold and uppercase.
+   Sizes step up at lg. */
+@utility type-display {
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  @variant lg {
+    font-size: 3rem;
+    line-height: 3.5rem;
+  }
+}
+
+@utility type-title-l {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  @variant lg {
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+}
+
+@utility type-title-m {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  @variant lg {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}
+
+@utility type-title-s {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  @variant lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+/* Long-form copy */
+@utility type-body-l {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  @variant lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+/* Default UI text: product names, prices, nav items */
+@utility type-body {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+}
+
+@utility type-body-strong {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+/* Small labels: badges ("New in"), meta, legal */
+@utility type-caption {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Buttons and CTA links */
+@utility type-cta {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* --- Layout primitives ---------------------------------------------------- */
+/* Centred page column with responsive side gutters */
+@utility container-page {
+  width: 100%;
+  max-width: calc(var(--container-page) + var(--spacing-gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--spacing-gutter);
+}
+
+/* Edge-to-edge block inside container-page (hero, full-bleed imagery) */
+@utility bleed {
+  margin-inline: calc(var(--spacing-gutter) * -1);
+}
+
+/* Vertical rhythm between page sections */
+@utility section-y {
+  padding-block: var(--spacing-section);
+}
+
+/* 12-column layout grid (4 columns on mobile) */
+@utility grid-page {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 0.5rem;
+  @variant md {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 1rem;
+  }
+}
+
+/* Product listing grid: tight columns so imagery dominates, generous rows */
+@utility grid-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 0.25rem;
+  row-gap: 2rem;
+  @variant md {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 0.5rem;
+  }
+  @variant lg {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    row-gap: 3rem;
+  }
+}
+
+/* Image frame: fixed ratio, soft neutral backdrop, cover-cropped children.
+   Pair with aspect-product / aspect-portrait / aspect-hero. */
+@utility media-frame {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--canvas);
+  & > img,
+  & > video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* --- Buttons ---------------------------------------------------------------
+   Usage: <button class="btn btn-primary">. The fill sits on ::before so hover
+   can shrink it slightly, which reads as a press rather than a colour swap. */
+@utility btn {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 1rem 1.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--btn-fg, var(--foreground));
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: var(--radius-control);
+    background: var(--btn-bg, transparent);
+    box-shadow: inset 0 0 0 1px var(--btn-border, transparent);
+    transition: transform var(--animate-duration-slow) var(--ease-luxe);
+  }
+  @media (hover: hover) {
+    &:hover::before {
+      transform: scale(0.97, 0.9);
+    }
+  }
+  &:disabled,
+  &[aria-disabled="true"] {
+    cursor: not-allowed;
+    --btn-fg: var(--muted);
+    --btn-bg: var(--subtle);
+    --btn-border: transparent;
+  }
+  &:disabled::before,
+  &[aria-disabled="true"]::before {
+    transform: none;
+  }
+}
+
+/* Solid: the single main action on a view (add to bag, checkout) */
+@utility btn-primary {
+  --btn-fg: var(--background);
+  --btn-bg: var(--foreground);
+}
+
+/* Outlined, translucent: secondary actions, CTAs laid over imagery */
+@utility btn-secondary {
+  --btn-fg: var(--foreground);
+  --btn-bg: color-mix(in srgb, var(--background) 50%, transparent);
+  --btn-border: var(--foreground);
+  &::before {
+    backdrop-filter: blur(15px);
+  }
+}
+
+/* Full width on mobile, content width from md up */
+@utility btn-block {
+  width: 100%;
+  @variant md {
+    width: auto;
+  }
+}
+
+/* Round icon-only control (bag, search, close) */
+@utility btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: background-image 300ms var(--ease-luxe);
+  /* Tint layered over any background, so btn-icon also works on solid chips */
+  @media (hover: hover) {
+    &:hover {
+      background-image: linear-gradient(var(--divider), var(--divider));
+    }
+  }
+}
+
+/* --- Links -------------------------------------------------------------- */
+@keyframes underline-swipe {
+  0% {
+    background-size: 100% 1px;
+    background-position: 100% 100%;
+  }
+  50% {
+    background-size: 0% 1px;
+    background-position: 100% 100%;
+  }
+  50.01% {
+    background-size: 0% 1px;
+    background-position: 0% 100%;
+  }
+  100% {
+    background-size: 100% 1px;
+    background-position: 0% 100%;
+  }
+}
+
+/* Underlined text link; on hover the rule exits right and re-enters left */
+@utility link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: 0% 100%;
+  padding-bottom: 1px;
+  cursor: pointer;
+  @media (hover: hover) {
+    &:hover {
+      animation: underline-swipe var(--animate-duration-slow) var(--ease-luxe);
+    }
+  }
+}
+
+/* Quiet link (nav, footer): no rule until hover or when current */
+@utility link-subtle {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  background-position: 0% 100%;
+  padding-bottom: 1px;
+  cursor: pointer;
+  transition: background-size 500ms var(--ease-luxe);
+  @media (hover: hover) {
+    &:hover {
+      background-size: 100% 1px;
+    }
+  }
+  &[aria-current="page"] {
+    background-size: 100% 1px;
+  }
+}
